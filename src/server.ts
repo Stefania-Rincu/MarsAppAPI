@@ -1,7 +1,8 @@
 import express from "express";
 import { fetchRovers } from "./rovers"
-import {fetchPhotos} from "./photos";
+import { fetchPhotos } from "./photos";
 import * as dotenv from "dotenv";
+import {marsJob} from "./info";
 dotenv.config();
 
 const app = express();
@@ -36,6 +37,8 @@ router.get('/rovers/:roverName/photos/:cameraType', async (req, res) => {
         res.status(500).json(error.message);
     }
 });
+
+marsJob();
 
 
 app.use('/', router);
