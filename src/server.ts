@@ -1,5 +1,8 @@
 import express from "express";
 import { fetchRovers } from "./rovers"
+import {fetchPhotos} from "./photos";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 const port = 8000;
@@ -7,6 +10,7 @@ const port = 8000;
 app.use(express.json());
 const router = express.Router();
 router.get('/test', (req: any, res: any) => res.send('Hello world !'));
+
 
 router.get('/rovers', async (req, res) => {
     try {
@@ -18,7 +22,23 @@ router.get('/rovers', async (req, res) => {
     }
 });
 
+
+router.get('/rovers/:roverName/photos/:cameraType', async (req, res) => {
+    const roverName: string = req.params.roverName;
+    const cameraType: string = req.params.cameraType;
+
+    try {
+        const photos = await fetchPhotos(roverName, cameraType);
+        res.json(photos);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json(error.message);
+    }
+});
+
+
 app.use('/', router);
+
 
 app.listen(port, () => {
     console.log(`Test backend is running on port ${port}`);

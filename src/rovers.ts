@@ -1,6 +1,12 @@
 import axios from "axios";
-import * as dotenv from "dotenv";
-dotenv.config();
+
+export interface Rover {
+    id: number;
+    name: string;
+    landingDate: Date;
+    launchDate: Date;
+    status: string;
+}
 
 interface RoversAPIData {
     id: number;
@@ -20,7 +26,18 @@ interface RoversResponse {
 
 export const fetchRovers = async () => {
     const response = await axios.get<RoversResponse>(`https://api.nasa.gov/mars-photos/api/v1/rovers?api_key=${process.env.API_KEY}`);
-    const roversData: RoversResponse = response.data;
+    const roversData = response.data.rovers;
 
-    return roversData;
+    const rovers: Rover[] = roversData.map(rover => {
+        return {
+            id: rover.id,
+            name: rover.name,
+            landingDate: rover.landing_date,
+            launchDate: rover.launch_date,
+            status: rover.status,
+            total_photos: rover.total_photos
+        }
+    })
+
+    return rovers;
 }
