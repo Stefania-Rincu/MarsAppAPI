@@ -6,6 +6,7 @@ dotenv.config();
 
 const app = express();
 const port = 8000;
+export const NASA_API_BASE_URL: string = `https://api.nasa.gov/mars-photos/api/v1/rovers`;
 
 app.use(express.json());
 const router = express.Router();

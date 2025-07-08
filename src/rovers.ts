@@ -1,4 +1,5 @@
 import axios from "axios";
+import { NASA_API_BASE_URL } from "./server";
 
 export interface Rover {
     id: number;
@@ -6,6 +7,7 @@ export interface Rover {
     landingDate: Date;
     launchDate: Date;
     status: string;
+    totalPhotos: number;
 }
 
 interface RoversAPIData {
@@ -24,20 +26,18 @@ interface RoversResponse {
     rovers: RoversAPIData[]
 }
 
-export const fetchRovers = async () => {
-    const response = await axios.get<RoversResponse>(`https://api.nasa.gov/mars-photos/api/v1/rovers?api_key=${process.env.API_KEY}`);
-    const roversData = response.data.rovers;
+export const fetchRovers = async (): Promise<Rover[]> => {
+    const response = await axios.get<RoversResponse>(`${NASA_API_BASE_URL}?api_key=${process.env.API_KEY}`);
+    const roversData: RoversAPIData[] = response.data.rovers;
 
-    const rovers: Rover[] = roversData.map(rover => {
+    return roversData.map((rover: RoversAPIData): Rover => {
         return {
             id: rover.id,
             name: rover.name,
             landingDate: rover.landing_date,
             launchDate: rover.launch_date,
             status: rover.status,
-            total_photos: rover.total_photos
+            totalPhotos: rover.total_photos
         }
-    })
-
-    return rovers;
+    });
 }

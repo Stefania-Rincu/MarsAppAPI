@@ -1,6 +1,7 @@
 import axios from "axios";
 import {Camera} from "./cameras";
 import {Rover} from "./rovers";
+import {NASA_API_BASE_URL} from "./server";
 
 interface TrimmedPhoto {
     id: number;
@@ -9,7 +10,6 @@ interface TrimmedPhoto {
     imgSrc: string;
     earthDate: Date;
 }
-
 
 interface PhotoAPIData {
     id: number;
@@ -20,18 +20,15 @@ interface PhotoAPIData {
     rover: Rover;
 }
 
-
 interface PhotoResponse {
     photos: PhotoAPIData[]
 }
 
+export const fetchPhotos = async (roverName: string, cameraType: string): Promise<TrimmedPhoto[]> => {
+    const photoResponse = await axios.get<PhotoResponse>(`${NASA_API_BASE_URL}/${roverName}/photos?sol=1000&camera=${cameraType}&api_key=${process.env.API_KEY}`);
+    const photos: PhotoAPIData[] = photoResponse.data.photos;
 
-export const fetchPhotos = async (roverName: string, cameraType: string) => {
-    const photoResponse = await axios.get<PhotoResponse>(` https://api.nasa.gov/mars-photos/api/v1/rovers/${roverName}/photos?sol=1000&camera=${cameraType}&api_key=${process.env.API_KEY}`);
-    const photos = photoResponse.data.photos;
-
-
-    const trimmedPhotos: TrimmedPhoto[] = photos.map((photo: PhotoAPIData) => {
+    return photos.map((photo: PhotoAPIData): TrimmedPhoto => {
         console.log(photo.camera);
         return {
             id: photo.id,
@@ -41,6 +38,4 @@ export const fetchPhotos = async (roverName: string, cameraType: string) => {
             earthDate: photo.earth_date,
         }
     });
-
-    return trimmedPhotos;
 }
